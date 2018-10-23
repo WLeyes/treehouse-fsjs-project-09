@@ -73,17 +73,6 @@ export default class AddEditCourses extends Component {
     }
   }
 
-  componentDidMount() {
-    const courseID = this.props.match.params.id;
-    if(!courseID){
-      this.setState({
-        formType: 'Add Course'
-      })
-    } else {
-      // 
-    }
-  }
-
   updateFields = (course, courseID, formType) => {
     const newFormData = { ...this.state.formData }
     for(let key in newFormData){
@@ -95,6 +84,36 @@ export default class AddEditCourses extends Component {
       formType,
       formData: newFormData
     })
+  }
+
+  componentDidMount() {
+    const courseID = this.props.match.params.id;
+    if(!courseID){
+      this.setState({
+        formType: 'Add Course'
+      })
+    } else {
+      // import from api
+    }
+  }
+
+  updateForm(element, content = '') {
+    const newFormData = {...this.state.formData};
+    const newElement = {...newFormData[element.id]};
+    content === '' ?
+    newElement.value = element.event.target.value
+    : newElement.value = content
+    let validData = validate(newElement);
+    newElement.validationMessage = validData[1];
+    newFormData[element.id] = newElement;
+    this.setState({
+      formError: false,
+      formData: newFormData
+    });
+  }
+
+  submitForm(event){
+    
   }
 
   render() {
