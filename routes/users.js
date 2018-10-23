@@ -4,8 +4,15 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/models").User;
 
-// CREATE
+// CREATE - GET /register
+router.get('/register', (req, res, next) => {
+  res.json({message: 'Register today!'});
+});
 
+// CREATE - POST /register
+router.post('/register', (req, res, next) => {
+  res.json({message: 'User created!'});
+});
 
 // READ
 router.get('/', (req, res, next) => {
