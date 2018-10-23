@@ -19,7 +19,31 @@ router.param("cID", function(req, res, next, id){
 
 // CREATE - POST /api/courses
 router.post('/', (req, res, next) => {
+  if(req.body.title &&
+    req.body.description){
+
+      const courseData = {
+        title: req.body.title,
+        description: req.body.description,
+        estimatedTime: req.body.estimatedTime,
+        materialsNeeded: req.body.materialsNeeded
+      }
   
+      Course.create(courseData, function(error) {
+        if(error){
+          return next(error);
+        } else {
+          return res.redirect('/api/courses');
+        }
+      });
+
+// todo: check if authenticated
+    } else {
+      let err = new Error(' Title and description are required.');
+      err.status = 400;
+      return next(err); 
+    }
+    console.log(req.body);
 });
 
 // READ - GET /api/courses
