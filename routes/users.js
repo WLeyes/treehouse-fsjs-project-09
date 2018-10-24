@@ -39,12 +39,12 @@ router.post('/', (req, res, next) => {
 
 // Middleware Returns the currently authenticated user
 router.use( (req, res, next) => {
-  console.log(auth(req).name);
   auth(req) ?
     User.findOne({  emailAddress: auth(req).name })
       .exec( function(err, user) {
         if(bcrypt.compareSync(auth(req).pass, user.password)){
           console.log('Passwords match');
+          req.user = user;
           next();
         } else {
           console.log('Passwords do not match');
@@ -53,7 +53,7 @@ router.use( (req, res, next) => {
           next(error);
         }
       })
-     :next();
+     :next(req.name = '');
   }
 );
 
