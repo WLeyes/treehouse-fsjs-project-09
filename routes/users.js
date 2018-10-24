@@ -53,7 +53,7 @@ router.use( (req, res, next) => {
           next(error);
         }
       })
-     :next(req.name = '');
+     :next();
   }
 );
 
