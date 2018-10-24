@@ -3,6 +3,11 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course").Course;
+const User = require("../models/User").User;
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+const auth = require('basic-auth');
 
 router.param("cID", function(req, res, next, id){
   Course.findById(id, function(err, doc){
@@ -17,18 +22,45 @@ router.param("cID", function(req, res, next, id){
   });
 });
 
+// Middleware Returns the currently authenticated user || todo: fix if username is wrong
+router.use( (req, res, next) => {
+  auth(req) ?
+    User.findOne({  emailAddress: auth(req).name })
+      .exec( function(err, user) {
+        if(user){
+          if(bcrypt.compareSync(auth(req).pass, user.password)){
+            console.log('Passwords match');
+            req.user = user;
+            next();
+          } else {
+            console.log('Passwords do not match');
+            const error = new Error("Your password is not valid");
+            error.status = 401;
+            next(error);
+          }
+        } else {
+          console.log('Invalid user');
+            const error = new Error("Invalid user");
+            error.status = 401;
+            next(error);
+        }
+        
+      })
+     :next();
+  }
+);
+
 // CREATE - POST /api/courses 201 - Creates a course, sets the Location header to the URI for the course, and returns no content
 router.post('/', (req, res, next) => {
-  if(req.body.title &&
-    req.body.description){
-
-      const courseData = {
-        title: req.body.title,
-        description: req.body.description,
-        estimatedTime: req.body.estimatedTime,
-        materialsNeeded: req.body.materialsNeeded
-      }
-  
+  if(req.body.title && req.body.description){
+    const courseData = {
+      user: req.user,
+      title: req.body.title,
+      description: req.body.description,
+      estimatedTime: req.body.estimatedTime,
+      materialsNeeded: req.body.materialsNeeded
+    }
+    if(req.user){
       Course.create(courseData, function(error) {
         if(error){
           return next(error);
@@ -36,8 +68,12 @@ router.post('/', (req, res, next) => {
           return res.redirect('/api/courses');
         }
       });
+    } else {
+      let err = new Error('Please login to create post.');
+      err.status = 400;
+      return next(err); 
+    }
 
-// todo: check if authenticated
     } else {
       let err = new Error(' Title and description are required.');
       err.status = 400;

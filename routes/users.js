@@ -37,21 +37,29 @@ router.post('/', (req, res, next) => {
      }
 });
 
-// Middleware Returns the currently authenticated user
+// Middleware Returns the currently authenticated user || todo: fix if username is wrong
 router.use( (req, res, next) => {
   auth(req) ?
     User.findOne({  emailAddress: auth(req).name })
       .exec( function(err, user) {
-        if(bcrypt.compareSync(auth(req).pass, user.password)){
-          console.log('Passwords match');
-          req.user = user;
-          next();
+        if(user){
+          if(bcrypt.compareSync(auth(req).pass, user.password)){
+            console.log('Passwords match');
+            req.user = user;
+            next();
+          } else {
+            console.log('Passwords do not match');
+            const error = new Error("Your password is not valid");
+            error.status = 401;
+            next(error);
+          }
         } else {
-          console.log('Passwords do not match');
-          const error = new Error("Your password is not valid");
-          error.status = 401;
-          next(error);
+          console.log('Invalid user');
+            const error = new Error("Invalid user");
+            error.status = 401;
+            next(error);
         }
+        
       })
      :next();
   }
