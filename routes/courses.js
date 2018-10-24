@@ -98,13 +98,49 @@ router.get('/:cID', (req, res, next) => {
 });
 
 // UPDATE - PUT /api/courses/:id 204 - Updates a course and returns no content
-router.put('/:id', (req, res, next) => {
-
+router.put('/:cID', (req, res, next) => {
+  console.log(`req.user: ${req.user._id}`);
+  console.log(`req.body.user: ${req.body.user}`);
+  console.log(`res.body: ${res.body}`);
+  if(req.user){
+    if(req.user._id.toString() === req.body.user.toString()){
+      console.log('is owner');
+      
+      Course.updateOne(req.body,{
+        title: req.body.title,
+        description: req.body.description,
+        estimatedTime: req.body.estimatedTime,
+        materialsNeeded: req.body.materialsNeeded
+      });
+      console.log(`course: "${req.body.title}" has been updated.`);
+      return res.redirect('/api/courses/');
+      next();
+    } else{
+      console.log('is not the owner');
+      next();
+    }
+  } else {
+    let err = new Error('Please login to update post.');
+    err.status = 400;
+    return next(err); 
+  }
 });
 
 // DELETE - DELETE /api/courses/:id 204 - Deletes a course and returns no content
-router.delete('/:id', (req, res, next) => {
-  
+router.delete('/:cID', (req, res, next) => {
+  if(req.user){
+    if(req.user._id.toString() === req.body.user.toString()){
+      console.log('is owner');
+      next();
+    } else{
+      console.log('is not the owner');
+      next();
+    }
+  } else {
+    let err = new Error('Please login to delete post.');
+    err.status = 400;
+    return next(err); 
+  }
 });
 
 module.exports = router;
