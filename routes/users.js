@@ -37,7 +37,7 @@ router.post('/', (req, res, next) => {
      }
 });
 
-// RMiddleware Returns the currently authenticated user
+// Middleware Returns the currently authenticated user
 router.use( (req, res, next) => {
   console.log(auth(req).name);
   if(auth(req)){
@@ -56,7 +56,7 @@ router.use( (req, res, next) => {
   }
 });
 
-
+// READ - GET /api/users 200 - Returns the currently authenticated user
 router.get('/', (req, res, next) => {
   User.find({})
     .exec(function(err, users){
