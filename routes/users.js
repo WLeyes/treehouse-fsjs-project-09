@@ -62,7 +62,7 @@ router.get('/', (req, res, next) => {
   User.find({})
     .exec(function(err, user){
       if(err) return next(err);
-      res.json(user);
+      res.json(req.user);
     });
 });
 
