@@ -40,7 +40,7 @@ router.post('/', (req, res, next) => {
 // Middleware Returns the currently authenticated user
 router.use( (req, res, next) => {
   console.log(auth(req).name);
-  if(auth(req)){
+  auth(req) ?
     User.findOne({  emailAddress: auth(req).name })
       .exec( function(err, user) {
         if(bcrypt.compareSync(auth(req).pass, user.password)){
@@ -52,9 +52,10 @@ router.use( (req, res, next) => {
           error.status = 401;
           next(error);
         }
-      });
+      })
+     :next();
   }
-});
+);
 
 // READ - GET /api/users 200 - Returns the currently authenticated user
 router.get('/', (req, res, next) => {
