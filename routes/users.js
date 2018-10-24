@@ -2,18 +2,20 @@
 
 const express = require("express");
 const router = express.Router();
-const User = require("../models/models").User;
+const User = require("../models/User").User;
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+const auth = require('basic-auth');
 
-// CREATE - POST /api/users
+// CREATE - POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/', (req, res, next) => {
   if(req.body.firstName &&
      req.body.lastName &&
      req.body.emailAddress &&
      req.body.password){
+
        const userData = {
          firstName: req.body.firstName,
          lastName: req.body.lastName,
@@ -28,7 +30,6 @@ router.post('/', (req, res, next) => {
           return res.redirect('/api/users');
         }
       });
-// todo: check if authenticated
      } else {
       let err = new Error(' Title and description are required.');
       err.status = 400;
@@ -36,14 +37,28 @@ router.post('/', (req, res, next) => {
      }
 });
 
-// READ - GET /api/users
+// RMiddleware Returns the currently authenticated user
+router.use( (req, res, next) => {
+  User.findOne({  emailAddress: auth(req) })
+    .exec( (err, user)=> {
+      console.log(auth(req));
+      console.log(user);
+      if(user){
+        bcrypt.compare( auth(req).pass, user.password, (err, user) => {
+          
+        });
+      } else {
+        next();
+      } 
+    })
+});
+
 router.get('/', (req, res, next) => {
   User.find({})
-  .sort({createdAt: -1})
-  .exec(function(err, users){
-    if(err) return next(err);
-    res.json(users);
-  });
+    .exec(function(err, users){
+      if(err) return next(err);
+      res.json(req.user);
+    });
 });
 
 // UPDATE

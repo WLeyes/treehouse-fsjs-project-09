@@ -32,15 +32,15 @@ db.once("open", () => console.log("DB connection successful."));
 // TODO setup your api routes here
 
 // CORS - Pre-flight req
-app.use(function(req, res, next){
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-requested-With, Content-Type, Accept");
-  if(req.method === "OPTIONS"){
-    res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE");
-    return res.status(200).json({});
-  }
-  next();
-});
+// app.use(function(req, res, next){
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-requested-With, Content-Type, Accept");
+//   if(req.method === "OPTIONS"){
+//     res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE");
+//     return res.status(200).json({});
+//   }
+//   next();
+// });
 
 //  ROUTES
 app.get( '/', (req, res) => res.redirect('/api') );
