@@ -39,19 +39,23 @@ router.post('/', (req, res, next) => {
 
 // RMiddleware Returns the currently authenticated user
 router.use( (req, res, next) => {
-  User.findOne({  emailAddress: auth(req) })
-    .exec( (err, user)=> {
-      console.log(auth(req));
-      console.log(user);
-      if(user){
-        bcrypt.compare( auth(req).pass, user.password, (err, user) => {
-          
-        });
-      } else {
-        next();
-      } 
-    })
+  console.log(auth(req).name);
+  if(auth(req)){
+    User.findOne({  emailAddress: auth(req).name })
+      .exec( function(err, user) {
+        if(bcrypt.compareSync(auth(req).pass, user.password)){
+          console.log('Passwords match');
+          next();
+        } else {
+          console.log('Passwords do not match');
+          const error = new Error("Your password is not valid");
+          error.status = 401;
+          next(error);
+        }
+      });
+  }
 });
+
 
 router.get('/', (req, res, next) => {
   User.find({})
