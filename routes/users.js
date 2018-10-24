@@ -60,9 +60,9 @@ router.use( (req, res, next) => {
 // READ - GET /api/users 200 - Returns the currently authenticated user
 router.get('/', (req, res, next) => {
   User.find({})
-    .exec(function(err, users){
+    .exec(function(err, user){
       if(err) return next(err);
-      res.json(req.user);
+      res.json(user);
     });
 });
 
