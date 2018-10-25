@@ -32,7 +32,7 @@ router.post('/', (req, res, next) => {
       });
      } else {
       let err = new Error(' Title and description are required.');
-      err.status = 400;
+      err.sendStatus(400);
       return next(err); 
      }
 });
@@ -50,13 +50,13 @@ router.use( (req, res, next) => {
           } else {
             console.log('Passwords do not match');
             const error = new Error("Your password is not valid");
-            error.status = 401;
+            error.sendStatus(401);
             next(error);
           }
         } else {
           console.log('Invalid user');
             const error = new Error("Invalid user");
-            error.status = 401;
+            error.sendStatus(401);
             next(error);
         }
         
