@@ -136,16 +136,17 @@ router.put('/:cID', (req, res, next) => {
 // DELETE - DELETE /api/courses/:id 204 - Deletes a course and returns no content
 router.delete('/:cID', (req, res, next) => {
   if(req.user){
-    if(req.user._id.toString() === req.body.user.toString()){
+    if(req.course.user.toString() === req.user._id.toString()){
       console.log('is owner');
-      next();
+      req.course.remove();
+      return res.sendStatus(204);
     } else{
       console.log('is not the owner');
-      next();
+      return next();
     }
   } else {
     let err = new Error('Please login to delete post.');
-    err.status = 400;
+    err.sendStatus = 400;
     return next(err); 
   }
 });
