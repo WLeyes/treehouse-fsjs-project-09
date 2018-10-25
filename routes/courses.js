@@ -105,19 +105,26 @@ router.put('/:cID', (req, res, next) => {
   if(req.user){
     if(req.user._id.toString() === req.body.user.toString()){
       console.log('is owner');
+
+      Course.findOneAndUpdate(
+        { "_id": req.body._id },
+        { "$set": {
+          "title": req.body.title,
+          "description": req.body.description,
+          "estimatedTime": req.body.estimatedTime,
+          "materialsNeeded": req.body.materialsNeeded
+        }})
+        .exec(function(err, course){
+        if(err) {
+            console.log(err);
+            console.log('is not the owner');
+            return next();
+        } else {
+          console.log(`course: "${req.body.title}" has been updated.`);
+          return res.redirect(`/api/courses/${req.course._id}`);
+        }
+     }); 
       
-      Course.updateOne(req.body,{
-        title: req.body.title,
-        description: req.body.description,
-        estimatedTime: req.body.estimatedTime,
-        materialsNeeded: req.body.materialsNeeded
-      });
-      console.log(`course: "${req.body.title}" has been updated.`);
-      return res.redirect('/api/courses/');
-      next();
-    } else{
-      console.log('is not the owner');
-      next();
     }
   } else {
     let err = new Error('Please login to update post.');
