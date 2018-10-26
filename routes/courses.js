@@ -5,46 +5,51 @@ const router = express.Router();
 const Course = require("../models/Course").Course;
 const User = require("../models/User").User;
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
 
 const auth = require('basic-auth');
 
 router.param("cID", function(req, res, next, id){
-  Course.findById(id, function(err, doc){
-    if(err) return next(error);
-    if(!doc){
-      err = new Error("Not Found");
-      error.status = 404;
-      return next(error);
-    }
-    req.course = doc;
-    return next();
-  });
+  if (id.match(/^[0-9a-fA-F]{24}$/)) { // Check that id is a valid ObjectId
+    Course.findById(id, function(error,doc){
+      if(error) return next(error);
+      if(!doc){
+        const error = new Error("Not Found");
+        error.status = 404;
+        return next(error);
+      }
+      req.course = doc;
+      return next();
+    });
+  } else {
+    const error = new Error("Not Found");
+    error.status = 404;
+    return next(error);
+  }
+  
 });
 
 // Middleware Returns the currently authenticated user || todo: fix if username is wrong
 router.use( (req, res, next) => {
   auth(req) ?
     User.findOne({  emailAddress: auth(req).name })
-      .exec( function(err, user) {
+      .exec( function(error, user) {
         if(user){
           if(bcrypt.compareSync(auth(req).pass, user.password)){
             console.log('Passwords match');
             req.user = user;
-            next();
+            return next();
           } else {
             console.log('Passwords do not match');
-            const erroror = new Error("Your password is not valid");
+            const error = new Error("Your password is not valid");
             error.status = 401;
-            next(error);
+            return next(error);
           }
         } else {
           console.log('Invalid user');
-            const erroror = new Error("Invalid user");
+            const error = new Error("Invalid user");
             error.status = 401;
-            next(error);
+            return next(error);
         }
-        
       })
      :next();
   }
@@ -116,9 +121,9 @@ router.put('/:cID', (req, res, next) => {
           "estimatedTime": req.body.estimatedTime,
           "materialsNeeded": req.body.materialsNeeded
         }})
-        .exec(function(err, course){
-        if(err) {
-            console.log(err);
+        .exec(function(error, course){
+        if(error) {
+            console.log(error);
             console.log('is not the owner');
             return next();
         } else {
