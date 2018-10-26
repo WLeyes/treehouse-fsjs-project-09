@@ -11,6 +11,7 @@ const auth = require('basic-auth');
 
 // CREATE - POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/', (req, res, next) => {
+
   // based on https://stackoverflow.com/questions/18022365/mongoose-validate-email-syntax
   const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
   if( emailRegex.test(req.body.emailAddress) ){
@@ -25,11 +26,11 @@ router.post('/', (req, res, next) => {
        req.body.emailAddress &&
        req.body.password){
   
-         const userData = {
-           firstName: req.body.firstName,
-           lastName: req.body.lastName,
-           emailAddress: req.body.emailAddress,
-           password: bcrypt.hashSync(req.body.password, saltRounds)
+        const userData = {
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          emailAddress: req.body.emailAddress,
+          password: bcrypt.hashSync(req.body.password, saltRounds)
         }
   
         User.create(userData, function(error){
@@ -46,6 +47,7 @@ router.post('/', (req, res, next) => {
         error.status = 400;
         return next(error); 
        }
+
   } else {
     let error = new Error('Invalid email address format');
     error.status = 400;

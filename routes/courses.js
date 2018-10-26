@@ -149,7 +149,9 @@ router.delete('/:cID', (req, res, next) => {
       return res.sendStatus(204);
     } else{
       console.log('is not the owner');
-      return next();
+      const error = new Error('You are not authorized to delete this post');
+      error.status = 400;
+      return next(error); 
     }
   } else {
     const error = new Error('Please login to delete post.');
