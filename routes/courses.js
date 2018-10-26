@@ -87,8 +87,9 @@ router.post('/', (req, res, next) => {
 router.get('/', (req, res, next) => {
   Course.find({})
   .sort({createdAt: -1})
-  .exec(function(err, courses){
-    if(err) return next(error);
+  .populate('user', 'firstName lastName')
+  .exec(function(error, courses){
+    if(error) return next(error);
     res.json(courses);
   });
 });
