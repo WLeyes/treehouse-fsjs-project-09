@@ -10,7 +10,7 @@ const userRoutes = require("./routes/users");
 const courseRoutes = require("./routes/courses");
 
 // variable to enable global error logging
-const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
+const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'false';
 
 // create the Express app
 const app = express();
@@ -31,17 +31,6 @@ db.on( "error", err => console.error(`Connection error: ${err}`) );
 db.once("open", () => console.log("DB connection successful."));
 
 // TODO setup your api routes here
-
-// CORS - Pre-flight req
-// app.use(function(req, res, next){
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-requested-With, Content-Type, Accept");
-//   if(req.method === "OPTIONS"){
-//     res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE");
-//     return res.status(200).json({});
-//   }
-//   next();
-// });
 
 //  ROUTES
 app.get( '/', (req, res) => res.redirect('/api') );

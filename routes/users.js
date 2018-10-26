@@ -11,32 +11,46 @@ const auth = require('basic-auth');
 
 // CREATE - POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/', (req, res, next) => {
-  if(req.body.firstName &&
-     req.body.lastName &&
-     req.body.emailAddress &&
-     req.body.password){
-
-       const userData = {
-         firstName: req.body.firstName,
-         lastName: req.body.lastName,
-         emailAddress: req.body.emailAddress,
-         password: bcrypt.hashSync(req.body.password, saltRounds)
-      }
-
-      User.create(userData, function(error){
-        if(error){
-          return next(error);
-        } else {
-          res.location('/');
-          res.sendStatus(201);
+  // based on https://stackoverflow.com/questions/18022365/mongoose-validate-email-syntax
+  const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+  if( emailRegex.test(req.body.emailAddress) ){
+    if(!req.body.emailAddress){
+      const error = new Error('The e-mail field cannot be empty.');
+      error.status = 400;
+      return next(error);
+    }
+  
+    if(req.body.firstName &&
+       req.body.lastName &&
+       req.body.emailAddress &&
+       req.body.password){
+  
+         const userData = {
+           firstName: req.body.firstName,
+           lastName: req.body.lastName,
+           emailAddress: req.body.emailAddress,
+           password: bcrypt.hashSync(req.body.password, saltRounds)
         }
-      });
-
-     } else {
-      let err = new Error(' Title and description are required.');
-      err.status = 400;
-      return next(err); 
-     }
+  
+        User.create(userData, function(error){
+          if(error){
+            return next(error);
+          } else {
+            res.location('/');
+            res.sendStatus(201);
+          }
+        });
+  
+       } else {
+        let error = new Error('Title and description are required.');
+        error.status = 400;
+        return next(error); 
+       }
+  } else {
+    let error = new Error('Invalid email address format');
+    error.status = 400;
+    return next(error); 
+  }
 });
 
 // Middleware Returns the currently authenticated user || todo: fix if username is wrong
