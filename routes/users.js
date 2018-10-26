@@ -27,12 +27,14 @@ router.post('/', (req, res, next) => {
         if(error){
           return next(error);
         } else {
-          return res.redirect('/api/users');
+          res.location('/');
+          res.sendStatus(201);
         }
       });
+
      } else {
       let err = new Error(' Title and description are required.');
-      err.sendStatus(400);
+      err.status = 400;
       return next(err); 
      }
 });
@@ -50,13 +52,13 @@ router.use( (req, res, next) => {
           } else {
             console.log('Passwords do not match');
             const error = new Error("Your password is not valid");
-            error.sendStatus(401);
+            error.status  = 401;
             next(error);
           }
         } else {
           console.log('Invalid user');
             const error = new Error("Invalid user");
-            error.sendStatus(401);
+            error.status = 401;
             next(error);
         }
         

@@ -11,11 +11,11 @@ const auth = require('basic-auth');
 
 router.param("cID", function(req, res, next, id){
   Course.findById(id, function(err, doc){
-    if(err) return next(err);
+    if(err) return next(error);
     if(!doc){
       err = new Error("Not Found");
-      err.sendStatus(404);
-      return next(err);
+      error.status = 404;
+      return next(error);
     }
     req.course = doc;
     return next();
@@ -34,14 +34,14 @@ router.use( (req, res, next) => {
             next();
           } else {
             console.log('Passwords do not match');
-            const error = new Error("Your password is not valid");
-            error.sendStatus(401);
+            const erroror = new Error("Your password is not valid");
+            error.status = 401;
             next(error);
           }
         } else {
           console.log('Invalid user');
-            const error = new Error("Invalid user");
-            error.sendStatus(401);
+            const erroror = new Error("Invalid user");
+            error.status = 401;
             next(error);
         }
         
@@ -65,19 +65,20 @@ router.post('/', (req, res, next) => {
         if(error){
           return next(error);
         } else {
-          return res.redirect('/api/courses');
+          res.location('/');
+          res.sendStatus(201);
         }
       });
     } else {
-      let err = new Error('Please login to create post.');
-      err.sendStatus(400);
-      return next(err); 
+      const error = new Error('Please login to create post.');
+      error.status = 400;
+      return next(error); 
     }
 
     } else {
-      let err = new Error(' Title and description are required.');
-      err.sendStatus(400);
-      return next(err); 
+      const error = new Error('Title and description are required.');
+      error.status = 400;
+      return next(error); 
     }
     console.log(req.body);
 });
@@ -87,7 +88,7 @@ router.get('/', (req, res, next) => {
   Course.find({})
   .sort({createdAt: -1})
   .exec(function(err, courses){
-    if(err) return next(err);
+    if(err) return next(error);
     res.json(courses);
   });
 });
@@ -121,15 +122,15 @@ router.put('/:cID', (req, res, next) => {
             return next();
         } else {
           console.log(`course: "${req.body.title}" has been updated.`);
-          return res.redirect(`/api/courses/${req.course._id}`);
+          return res.sendStatus(204);
         }
      }); 
       
     }
   } else {
-    let err = new Error('Please login to update post.');
-    err.sendStatus(400);
-    return next(err); 
+    const error = new Error('Please login to update post.');
+    error.status = 400;
+    return next(error); 
   }
 });
 
@@ -145,9 +146,9 @@ router.delete('/:cID', (req, res, next) => {
       return next();
     }
   } else {
-    let err = new Error('Please login to delete post.');
-    err.sendStatus(400);
-    return next(err); 
+    const error = new Error('Please login to delete post.');
+    error.status = 400;
+    return next(error); 
   }
 });
 
