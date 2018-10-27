@@ -31,6 +31,16 @@ db.on( "error", err => console.error(`Connection error: ${err}`) );
 db.once("open", () => console.log("DB connection successful."));
 
 // TODO setup your api routes here
+// CORS - Pre-flight req
+app.use( (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-requested-With, Content-Type, Accept");
+  if(req.method === "OPTIONS"){
+    res.header("Access-Control-Allow-Methods", "GET, POST, DELETE");
+    return res.status(200).json({});
+  }
+  next();
+});
 
 //  ROUTES
 app.get( '/', (req, res) => res.redirect('/api') );
@@ -56,6 +66,7 @@ app.use((err, req, res, next) => {
     error: {},
   });
 });
+
 
 // set our port
 app.set('port', process.env.PORT || 5000);

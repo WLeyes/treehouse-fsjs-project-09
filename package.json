@@ -4,10 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "api": "nodemon ./app.js",
+    "start": "nodemon ./app.js",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'",
     "client": "cd api-frontend && npm start",
-    "start": "concurrently --kill-others \"npm run api\" \"npm run client\""
+    "fullstack": "concurrently --kill-others \"npm start\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,7 @@
     "nodemon": "^1.18.4"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "basic-auth": "^2.0.1",
     "bcrypt": "^3.0.2",
     "concurrently": "^4.0.1",
